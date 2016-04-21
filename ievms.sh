@@ -541,6 +541,9 @@ fi
 			"c:\\webpagetest\\certutil –addstore –f TrustedPublisher c:\\webpagetest\\WPOFoundation.cer "
 		guest_control_exec "${1}" "cmd.exe" /c \
 			"c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\32bit\\netipfw.inf -i -s "
+		guest_control_exec "${1}" "cmd.exe" /c \
+        		"shutdown.exe /s /f /t 0"
+        	wait_for_guestcontrol "${1}"
 
 	else
 		log "on correct directory"
@@ -556,17 +559,18 @@ fi
                         "bcdedit.exe -set TESTSIGNING ON >>c:\\webpagetest\\wpt.bat"
                 guest_control_exec "${1}" "cmd.exe" /c \
                         "bcdedit /set {default} bootstatuspolicy ignoreallfailures >>c:\\webpagetest\\wpt.bat"
-                guest_control_exec "${1}" "cmd.exe" /c \
-			             "copy c:\webpagetest\wpt.bat C:\Users\\${guest_user}\\ievms.bat"
-                guest_control_exec "${1}" "schtasks.exe" /run /tn ievms
-
 		guest_control_exec "${1}" "cmd.exe" /c \
 			"echo start Certutil –addstore –f TrustedPublisher c:\\webpagetest\\WPOFoundation.cer >>c:\\webpagetest\\wpt.bat"
 		guest_control_exec "${1}" "cmd.exe" /c \
 			"echo start  c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\netipfw.inf -i -s >>c:\\webpagetest\\wpt.bat"
 		guest_control_exec "${1}" "cmd.exe" /c \
-			"copy c:\webpagetest\wpt.bat C:\Users\\${guest_user}\\ievms.bat"
-		guest_control_exec "${1}" "schtasks.exe" /run /tn ievms
+			"echo shutdown.exe /s /f /t 0 >>C:\\Users\\${guest_user}\\wpt.bat"
+		guest_control_exec "${1}" "cmd.exe" /c \
+			             "copy c:\webpagetest\wpt.bat C:\Users\\${guest_user}\\ievms.bat"
+                guest_control_exec "${1}" "schtasks.exe" /run /tn ievms
+
+    		wait_for_guestcontrol "${1}"
+
 	fi
 	
 	# powersavings autoit script tbd
