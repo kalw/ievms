@@ -5,15 +5,12 @@ export PATH=$PATH:/usr/local/bin/
 # Caution is a virtue.
 set -o nounset
 set -o errtrace
-#set -o errexit
-#set -o pipefail
 set -x
 # ## Gobal Variables
 
 # The ievms version.
 ievms_version="0.3.1"
 
-WINDOWS_KEY="qqrg9-dmgcd-8v7jg-8d2kk-b6vyj"
 
 # Options passed to each `curl` command.
 curl_opts=${CURL_OPTS:-""}
@@ -656,6 +653,7 @@ install_ie_win2k8() { # vm url md5
     local src=`basename "${2}"`
     local dest="C:\\Users\\${guest_user}\\Desktop\\${src}"
 
+
     download "${src}" "${2}" "${src}" "${3}"
     start_vm "${1}"
     wait_for_guestcontrol "${1}"
@@ -720,6 +718,12 @@ build_ievm() {
             os="Win10"
             unit="8"
             ;;
+        EDGE)
+            prefix="MS"
+            version="Edge"
+            os="Win10"
+            unit="8"
+            ;;
         *) fail "Invalid IE version: ${1}" ;;
     esac
 
@@ -743,11 +747,11 @@ build_ievm() {
         IE7_Vista.zip) md5="d5269b2220f5c7fb9786dad513f2c05a" ;;
         #IE8_Win2k8.zip) md5="9e491948286ed3015f695cb49c939776" ;;
 	IE8_Win7.zip) md5="21b0aad3d66dac7f88635aa2318a3a55" ;;
-        IE9_Win7.zip) md5="58d201fe7dc7e890ad645412264f2a2c" ;;
-        IE9_Win2k8.zip) md5="a69086febf216cb8452495f1aeb64d5e" ;;
+    IE9_Win7.zip) md5="58d201fe7dc7e890ad645412264f2a2c" ;;
+    IE9_Win2k8.zip) md5="a69086febf216cb8452495f1aeb64d5e" ;;
 	IE10_Win2k8.zip) md5="8c8620cb1ee4c4ce17f6f2d95d5fff56" ;;
 	IE10_Win8.zip) md5="cc4e2f4b195e1b1e24e2ce6c7a6f149c" ;;
-        MSEdge_Win10.zip) md5="c1011b491d49539975fb4c3eeff16dae" ;;
+    MSEdge_Win10.zip) md5="c1011b491d49539975fb4c3eeff16dae" ;;
     esac
     
     log "Checking for existing OVA at ${ievms_home}/${ova}"
@@ -882,7 +886,7 @@ check_unar
 #
 ## Install each requested virtual machine sequentially.
 #all_versions="6 7 8 9 10 11 EDGE" IE6 et 7 will not work w/wptdriver ; urlblast only
-all_versions="8 9 10 11"
+all_versions="6 7 8 9 10 11 EDGE"
 IEVMS_VERSIONS="9"
 for ver in ${IEVMS_VERSIONS:-$all_versions}
 do
