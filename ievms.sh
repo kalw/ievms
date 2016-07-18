@@ -316,7 +316,7 @@ init_wpt_agent(){ # $1 IEVM(_IE8)|Location $2 2.14|"" $3 dda3a3a92924a99a752dea1
  
 	if [ "$1" == "" ]
 		then
-			WPT_SERVER_LOCATION="IEVM"
+			WPT_SERVER_LOCATION="IEVM_${ver}"
 		else
 			WPT_SERVER_LOCATION="$1"
 	fi
@@ -861,8 +861,8 @@ build_ievm_ie11() {
 
 
 ## tests
-ver=8
-vmlocation=Moscow
+#ver=8
+#vmlocation=Moscow
 #install_wpt_agent "IE8 - WinXP" "${WPT_FILENAME}" "WinXP"
 #exit
 ## </tests>
@@ -879,7 +879,7 @@ all_versions="8 9 10 11"
 for ver in ${IEVMS_VERSIONS:-$all_versions}
 do
 	### wpt
-	init_wpt_agent "${vmlocation}" "2.18" "c92c2257a9a3efe265b52876bd0417bb" "perfs.digitas.fr" # "" $1 IEVM(_IE8)|"" $2 2.14|"" $3 dda3a3a92924a99a752dea12dd5db470|"" $4 WPT_SERVER_URL
+	init_wpt_agent "${WPT_SERVER_LOCATION}" "${WPT_VERSION}" "${WPT_MD5}" "${WPT_SERVER_URL}" # "" $1 IEVM(_IE8)|"" $2 2.14|"" $3 dda3a3a92924a99a752dea12dd5db470|"" $4 WPT_SERVER_URL
     log "Building IE ${ver} VM"
     build_ievm $ver
 
