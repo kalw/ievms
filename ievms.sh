@@ -465,7 +465,102 @@ fi
 	guest_control_exec "${1}" "cmd.exe" /c \
 		"echo @ECHO ON >>c:\\webpagetest\\wpt.bat"
 	
+	if [ "${3}" == "WinXP" ]
+	then
+		guest_control_exec "${1}" "cmd.exe" /c \
+			"c:\\webpagetest\\wpt.bat"
+		log 'netipfw.install.xp'
+		guest_control_exec "${1}" "cmd.exe" /c \
+			"c:\\webpagetest\\certutil –addstore –f TrustedPublisher c:\\webpagetest\\WPOFoundation.cer "
+		guest_control_exec "${1}" "cmd.exe" /c \
+			"c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\64bit\\netipfw.inf -i -s "
+		guest_control_exec "${1}" "cmd.exe" /c \
+        		"shutdown.exe /s /f /t 0"
+        	wait_for_guestcontrol "${1}"
 
+	elif [ "${3}" == "Win7" ]
+	then	log "on correct directory"
+		guest_control_exec "${1}" "cmd.exe" /c \
+			"cd /windows/system32/"
+		log "Disable LUA"
+		guest_control_exec "${1}" "cmd.exe" /c \
+                "echo start /wait %windir%\System32\reg.exe ADD HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f >>c:\webpagetest\wpt.bat"
+                log "Disable driver installation integrity checks"
+                guest_control_exec "${1}" "cmd.exe" /c \
+                        "echo start /wait  bcdedit.exe -set nointegritychecks ON >>c:\\webpagetest\\wpt.bat"
+                guest_control_exec "${1}" "cmd.exe" /c \
+                        "echo start /wait bcdedit.exe -set TESTSIGNING ON >>c:\\webpagetest\\wpt.bat"
+                guest_control_exec "${1}" "cmd.exe" /c \
+                        "echo start /wait bcdedit /set {default} bootstatuspolicy ignoreallfailures >>c:\\webpagetest\\wpt.bat"
+		guest_control_exec "${1}" "cmd.exe" /c \
+			"echo start /wait Certutil –addstore –f TrustedPublisher c:\\webpagetest\\WPOFoundation.cer >>c:\\webpagetest\\wpt.bat"
+		guest_control_exec "${1}" "cmd.exe" /c \
+			"echo start /wait  c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\netipfw.inf -i -s >>c:\\webpagetest\\wpt.bat"
+		guest_control_exec "${1}" "cmd.exe" /c \
+			"echo shutdown.exe /s /f /t 0 >>C:\\webpagetest\\wpt.bat"
+                guest_control_exec "${1}" "cmd.exe" /c \
+			"copy c:\\webpagetest\\wpt.bat C:\Users\\${guest_user}\\ievms.bat"
+		guest_control_exec "${1}" "schtasks.exe" /run /tn ievms
+        	wait_for_shutdown "${1}"
+
+	fi
+		# powersavings autoit script tbd
+	# firewall autoit script tbd
+
+	if [ "${3}" == "Win2k8" ]
+	then
+		log "Disable IE ESC"
+		VBoxManage guestcontrol "${1}" run  "reg.exe" --username \
+			Administrator --password "${guest_pass}"  -- add \
+			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}" \
+			/v “IsInstalled” /t REG_DWORD /d 0 /f
+		VBoxManage guestcontrol "${1}" run  "reg.exe" --username \
+			Administrator --password "${guest_pass}"  -- add \
+			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}" \
+			/v “IsInstalled” /t REG_DWORD /d 0 /f
+		guest_control_exec "${1}" "cmd.exe" /c \
+			"Rundll32 iesetup.dll,IEHardenUser"
+		guest_control_exec "${1}" "cmd.exe" /c \
+			"Rundll32 iesetup.dll,IEHardenAdmin"
+		guest_control_exec "${1}" "cmd.exe" /c \
+			"Rundll32 iesetup.dll,IEHardenMachineNow"
+		VBoxManage guestcontrol "${1}" run  "reg.exe" --username \
+			Administrator --password "${guest_pass}"  -- add \
+			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\OC Manager\Subcomponents" \
+			/v “iehardenadmin” /t REG_DWORD /d 0 /f
+		VBoxManage guestcontrol "${1}" run  "reg.exe" --username \
+			Administrator --password "${guest_pass}"  -- add \
+			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\OC Manager\Subcomponents" \
+			/v “iehardenuser” /t REG_DWORD /d 0 /f
+		VBoxManage guestcontrol "${1}" run "reg.exe" --username \
+			Administrator --password "${guest_pass}"  -- delete \
+			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}" \
+			/f /va
+		VBoxManage guestcontrol "${1}" run  "reg.exe" --username \
+			Administrator --password "${guest_pass}"  -- delete \
+			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}" \
+			/f /va
+		log "Disable LUA"
+                guest_control_exec "${1}" "cmd.exe" /c \
+                "echo start /wait %windir%\System32\reg.exe ADD HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f >> c:\webpagetest\wpt.bat"
+                log "Disable driver installation integrity checks"
+                guest_control_exec "${1}" "cmd.exe" /c \
+                        "echo start /wait bcdedit /set loadoptions DDISABLE_INTEGRITY_CHECKS  >>c:\\webpagetest\\wpt.bat"
+                guest_control_exec "${1}" "cmd.exe" /c \
+                        "echo start /wait bcdedit.exe -set TESTSIGNING ON >>c:\\webpagetest\\wpt.bat"
+                guest_control_exec "${1}" "cmd.exe" /c \
+                        "echo start /wait Certutil –addstore –f TrustedPublisher c:\\webpagetest\\WPOFoundation.cer >>c:\\webpagetest\\wpt.bat"
+                guest_control_exec "${1}" "cmd.exe" /c \
+                        "echo start /wait  c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\netipfw.inf -i -s >>c:\\webpagetest\\wpt.bat"
+                guest_control_exec "${1}" "cmd.exe" /c \
+                        "echo shutdown.exe /s /f /t 0 >>C:\\webpagetest\\wpt.bat"
+                guest_control_exec "${1}" "cmd.exe" /c \
+                        "copy c:\\webpagetest\\wpt.bat C:\Users\\${guest_user}\\ievms.bat"
+                guest_control_exec "${1}" "schtasks.exe" /run /tn ievms
+                wait_for_shutdown "${1}"
+
+	fi
+	
 	log "Installing 7z"
 	guest_control_exec "${1}" "cmd.exe" /c \
 		"echo start /wait msiexec /i C:\webpagetest\7z.msi /quiet /q INSTALLDIR=C:\7zip >>c:\\webpagetest\\wpt.bat"
@@ -524,113 +619,6 @@ fi
 	guest_control_exec "${1}" "cmd.exe" /c \
 		"echo start /wait schtasks /create /tn wptdriver /tr c:\webpagetest\agent\wptdriver.exe /sc onlogon  >>c:\\webpagetest\\wpt.bat"
 
-	if [ "${3}" == "WinXP" ]
-	then
-		echo "XP"
-	else
-	#	log "Disable UAC"
-	#	guest_control_exec "${1}" "cmd.exe" /c \
-	#	"echo REG ADD \\HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\ /f /v AutoAdminLogon /t REG_SZ /d 1 >>c:\webpagetest\wpt.bat" # todo: escapeing does not work properly
-		echo "NOT XP"
-	fi
-
-
-	if [ "${3}" == "WinXP" ]
-	then
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"c:\\webpagetest\\wpt.bat"
-		log 'netipfw.install.xp'
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"c:\\webpagetest\\certutil –addstore –f TrustedPublisher c:\\webpagetest\\WPOFoundation.cer "
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\64bit\\netipfw.inf -i -s "
-		guest_control_exec "${1}" "cmd.exe" /c \
-        		"shutdown.exe /s /f /t 0"
-        	wait_for_guestcontrol "${1}"
-
-	elif [ "${3}" == "Win7" ]
-	then	log "on correct directory"
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"cd /windows/system32/"
-		log "Disable LUA"
-		guest_control_exec "${1}" "cmd.exe" /c \
-                "echo start /wait %windir%\System32\reg.exe ADD HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f >>c:\webpagetest\wpt.bat"
-                log "Disable driver installation integrity checks"
-                guest_control_exec "${1}" "cmd.exe" /c \
-                        "echo start /wait  bcdedit.exe -set nointegritychecks ON >>c:\\webpagetest\\wpt.bat"
-                guest_control_exec "${1}" "cmd.exe" /c \
-                        "echo start /wait bcdedit.exe -set TESTSIGNING ON >>c:\\webpagetest\\wpt.bat"
-                guest_control_exec "${1}" "cmd.exe" /c \
-                        "echo start /wait bcdedit /set {default} bootstatuspolicy ignoreallfailures >>c:\\webpagetest\\wpt.bat"
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"echo start /wait Certutil –addstore –f TrustedPublisher c:\\webpagetest\\WPOFoundation.cer >>c:\\webpagetest\\wpt.bat"
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"echo start /wait  c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\netipfw.inf -i -s >>c:\\webpagetest\\wpt.bat"
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"echo shutdown.exe /s /f /t 0 >>C:\\webpagetest\\wpt.bat"
-                guest_control_exec "${1}" "cmd.exe" /c \
-			"copy c:\\webpagetest\\wpt.bat C:\Users\\${guest_user}\\ievms.bat"
-		guest_control_exec "${1}" "schtasks.exe" /run /tn ievms
-        	wait_for_shutdown "${1}"
-
-	fi
-
-	# powersavings autoit script tbd
-	# firewall autoit script tbd
-
-	if [ "${3}" == "Win2k8" ]
-	then
-		log "Disable IE ESC"
-		VBoxManage guestcontrol "${1}" run  "reg.exe" --username \
-			Administrator --password "${guest_pass}"  -- add \
-			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}" \
-			/v “IsInstalled” /t REG_DWORD /d 0 /f
-		VBoxManage guestcontrol "${1}" run  "reg.exe" --username \
-			Administrator --password "${guest_pass}"  -- add \
-			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}" \
-			/v “IsInstalled” /t REG_DWORD /d 0 /f
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"Rundll32 iesetup.dll,IEHardenUser"
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"Rundll32 iesetup.dll,IEHardenAdmin"
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"Rundll32 iesetup.dll,IEHardenMachineNow"
-		VBoxManage guestcontrol "${1}" run  "reg.exe" --username \
-			Administrator --password "${guest_pass}"  -- add \
-			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\OC Manager\Subcomponents" \
-			/v “iehardenadmin” /t REG_DWORD /d 0 /f
-		VBoxManage guestcontrol "${1}" run  "reg.exe" --username \
-			Administrator --password "${guest_pass}"  -- add \
-			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\OC Manager\Subcomponents" \
-			/v “iehardenuser” /t REG_DWORD /d 0 /f
-		VBoxManage guestcontrol "${1}" run "reg.exe" --username \
-			Administrator --password "${guest_pass}"  -- delete \
-			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}" \
-			/f /va
-		VBoxManage guestcontrol "${1}" run  "reg.exe" --username \
-			Administrator --password "${guest_pass}"  -- delete \
-			"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}" \
-			/f /va
-		log "Disable LUA"
-                guest_control_exec "${1}" "cmd.exe" /c \
-                "echo start /wait %windir%\System32\reg.exe ADD HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f >> c:\webpagetest\wpt.bat"
-                log "Disable driver installation integrity checks"
-                guest_control_exec "${1}" "cmd.exe" /c \
-                        "echo start /wait bcdedit /set loadoptions DDISABLE_INTEGRITY_CHECKS  >>c:\\webpagetest\\wpt.bat"
-                guest_control_exec "${1}" "cmd.exe" /c \
-                        "echo start /wait bcdedit.exe -set TESTSIGNING ON >>c:\\webpagetest\\wpt.bat"
-                guest_control_exec "${1}" "cmd.exe" /c \
-                        "echo start /wait Certutil –addstore –f TrustedPublisher c:\\webpagetest\\WPOFoundation.cer >>c:\\webpagetest\\wpt.bat"
-                guest_control_exec "${1}" "cmd.exe" /c \
-                        "echo start /wait  c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\netipfw.inf -i -s >>c:\\webpagetest\\wpt.bat"
-                guest_control_exec "${1}" "cmd.exe" /c \
-                        "echo shutdown.exe /s /f /t 0 >>C:\\webpagetest\\wpt.bat"
-                guest_control_exec "${1}" "cmd.exe" /c \
-                        "copy c:\\webpagetest\\wpt.bat C:\Users\\${guest_user}\\ievms.bat"
-                guest_control_exec "${1}" "schtasks.exe" /run /tn ievms
-                wait_for_shutdown "${1}"
-
-	fi
 
 }
 
