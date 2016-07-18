@@ -7,10 +7,7 @@ set -o nounset
 set -o errtrace
 set -x
 # ## Gobal Variables
-WPT_SERVER_LOCATION = ${WPT_SERVER_LOCATION:-}
-WPT_VERSION = ${WPT_VERSION:-}
-WPT_MD5 = ${WPT_MD5:-}
-WPT_SERVER_URL = ${WPT_SERVER_URL:-}
+
 
 # The ievms version.
 ievms_version="0.3.1"
@@ -883,7 +880,7 @@ all_versions="8 9 10 11"
 for ver in ${IEVMS_VERSIONS:-$all_versions}
 do
     ### wpt
-    init_wpt_agent "${WPT_SERVER_LOCATION}" "${WPT_VERSION}" "${WPT_MD5}" "${WPT_SERVER_URL}" # "" $1 IEVM(_IE8)|"" $2 2.14|"" $3 dda3a3a92924a99a752dea12dd5db470|"" $4 WPT_SERVER_URL
+    init_wpt_agent "${WPT_SERVER_LOCATION:-}" "${WPT_VERSION:-}" "${WPT_MD5:-}" "${WPT_SERVER_URL:-}" # "" $1 IEVM(_IE8)|"" $2 2.14|"" $3 dda3a3a92924a99a752dea12dd5db470|"" $4 WPT_SERVER_URL
     log "Building IE ${ver} VM"
     build_ievm $ver
 
