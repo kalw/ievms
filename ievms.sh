@@ -555,6 +555,9 @@ fi
 	log "Intalling AviSynth"
 	#guest_control_exec "${1}" "cmd.exe" /c \
 	#	"echo start /wait c:\webpagetest\agent\Avisynth_258.exe /S >>c:\\webpagetest\\wpt.bat"
+	log "pre-install dummynet driver"
+	guest_control_exec "${1}" "cmd.exe" /c \
+		"echo copy c:\webpagetest\agent\dummynet\64bit\*.*  c:\webpagetest\agent\dummynet >>c:\\webpagetest\\wpt.bat"
 	guest_control_exec "${1}" "cmd.exe" /c \
 		"echo start /wait  c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\netipfw.inf -i -s >>c:\\webpagetest\\wpt.bat"
 	log "Intalling Safari"
@@ -575,10 +578,6 @@ fi
 	log "Using stable clock"
 	guest_control_exec "${1}" "cmd.exe" /c \
 		"echo bcdedit /set {default} useplatformclock true >>c:\\webpagetest\\wpt.bat"
-
-	log "pre-install dummynet driver"
-	guest_control_exec "${1}" "cmd.exe" /c \
-		"echo copy c:\webpagetest\agent\dummynet\64bit\*.*  c:\webpagetest\agent\dummynet >>c:\\webpagetest\\wpt.bat"
 
 	log "clean disk content"
 	guest_control_exec "${1}" "cmd.exe" /c \
