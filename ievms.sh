@@ -463,22 +463,9 @@ fi
 	
 	log "will echo"
 	guest_control_exec "${1}" "cmd.exe" /c \
-		"echo @ECHO ON >>c:\\webpagetest\\wpt.bat"
+		"echo @ECHO ON >c:\\webpagetest\\wpt.bat"
 	
-	if [ "${3}" == "WinXP" ]
-	then
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"c:\\webpagetest\\wpt.bat"
-		log 'netipfw.install.xp'
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"c:\\webpagetest\\certutil –addstore –f TrustedPublisher c:\\webpagetest\\WPOFoundation.cer "
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\64bit\\netipfw.inf -i -s "
-		guest_control_exec "${1}" "cmd.exe" /c \
-        		"shutdown.exe /s /f /t 0"
-        	wait_for_guestcontrol "${1}"
-
-	elif [ "${3}" == "Win7" ]
+	if [ "${3}" == "Win7" ]
 	then	log "on correct directory"
 		guest_control_exec "${1}" "cmd.exe" /c \
 			"cd /windows/system32/"
@@ -563,7 +550,7 @@ fi
 	
 	log "Installing 7z"
 	guest_control_exec "${1}" "cmd.exe" /c \
-		"echo start /wait msiexec /i C:\webpagetest\7z.msi /quiet /q INSTALLDIR=C:\7zip >>c:\\webpagetest\\wpt.bat"
+		"echo start /wait msiexec /i C:\webpagetest\7z.msi /quiet /q INSTALLDIR=C:\7zip >c:\\webpagetest\\wpt.bat"
 	log "Unzip wpt agent"
 	guest_control_exec "${1}" "cmd.exe" /c \
 		"echo start /wait c:\7zip\7z.exe x c:\webpagetest\webpagetest_${WPT_VERSION}.zip -y -oc:\webpagetest agent/* >>c:\\webpagetest\\wpt.bat"
