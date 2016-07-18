@@ -480,8 +480,6 @@ fi
 		guest_control_exec "${1}" "cmd.exe" /c \
 			"echo start /wait Certutil –addstore –f TrustedPublisher c:\\webpagetest\\WPOFoundation.cer >>c:\\webpagetest\\wpt.bat"
 		guest_control_exec "${1}" "cmd.exe" /c \
-			"echo start /wait  c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\netipfw.inf -i -s >>c:\\webpagetest\\wpt.bat"
-		guest_control_exec "${1}" "cmd.exe" /c \
 			"echo shutdown.exe /s /f /t 0 >>C:\\webpagetest\\wpt.bat"
                 guest_control_exec "${1}" "cmd.exe" /c \
 			"copy c:\\webpagetest\\wpt.bat C:\Users\\${guest_user}\\ievms.bat"
@@ -535,9 +533,7 @@ fi
                         "echo start /wait bcdedit.exe -set TESTSIGNING ON >>c:\\webpagetest\\wpt.bat"
                 guest_control_exec "${1}" "cmd.exe" /c \
                         "echo start /wait Certutil –addstore –f TrustedPublisher c:\\webpagetest\\WPOFoundation.cer >>c:\\webpagetest\\wpt.bat"
-                guest_control_exec "${1}" "cmd.exe" /c \
-                        "echo start /wait  c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\netipfw.inf -i -s >>c:\\webpagetest\\wpt.bat"
-                guest_control_exec "${1}" "cmd.exe" /c \
+		guest_control_exec "${1}" "cmd.exe" /c \
                         "echo shutdown.exe /s /f /t 0 >>C:\\webpagetest\\wpt.bat"
                 guest_control_exec "${1}" "cmd.exe" /c \
                         "copy c:\\webpagetest\\wpt.bat C:\Users\\${guest_user}\\ievms.bat"
@@ -559,7 +555,8 @@ fi
 	log "Intalling AviSynth"
 	#guest_control_exec "${1}" "cmd.exe" /c \
 	#	"echo start /wait c:\webpagetest\agent\Avisynth_258.exe /S >>c:\\webpagetest\\wpt.bat"
-
+	guest_control_exec "${1}" "cmd.exe" /c \
+		"echo start /wait  c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\netipfw.inf -i -s >>c:\\webpagetest\\wpt.bat"
 	log "Intalling Safari"
 	guest_control_exec "${1}" "cmd.exe" /c \
 		"echo start /wait c:\webpagetest\SafariSetup.exe /quiet >>c:\\webpagetest\\wpt.bat"
