@@ -606,6 +606,9 @@ fi
 		"echo start /wait schtasks /create /tn wptdriver /tr c:\webpagetest\agent\wptdriver.exe /sc onlogon  >>c:\\webpagetest\\wpt.bat"
 	guest_control_exec "${1}" "cmd.exe" /c \
 		"echo shutdown.exe /s /f /t 0 >>C:\\webpagetest\\wpt.bat"
+	guest_control_exec "${1}" "cmd.exe" /c \
+                        "copy c:\\webpagetest\\wpt.bat C:\Users\\${guest_user}\\ievms.bat"
+        guest_control_exec "${1}" "schtasks.exe" /run /tn ievms
 	wait_for_shutdown "${1}"
 
 }
