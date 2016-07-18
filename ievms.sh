@@ -467,8 +467,6 @@ fi
 	
 	if [ "${3}" == "Win7" ]
 	then	log "on correct directory"
-		guest_control_exec "${1}" "cmd.exe" /c \
-			"cd /windows/system32/"
 		log "Disable LUA"
 		guest_control_exec "${1}" "cmd.exe" /c \
                 "echo start /wait %windir%\System32\reg.exe ADD HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f >>c:\webpagetest\wpt.bat"
