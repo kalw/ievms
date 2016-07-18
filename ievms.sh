@@ -604,6 +604,8 @@ fi
 		"echo start c:\webpagetest\startup.bat >>c:\\webpagetest\\wpt.bat"
 	guest_control_exec "${1}" "cmd.exe" /c \
 		"echo start /wait schtasks /create /tn wptdriver /tr c:\webpagetest\agent\wptdriver.exe /sc onlogon  >>c:\\webpagetest\\wpt.bat"
+	guest_control_exec "${1}" "cmd.exe" /c \
+		"echo shutdown.exe /s /f /t 0 >>C:\\webpagetest\\wpt.bat"
 	wait_for_shutdown "${1}"
 
 }
