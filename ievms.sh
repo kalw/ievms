@@ -547,7 +547,7 @@ fi
                 wait_for_shutdown "${1}"
 
 	fi
-	
+	wait_for_guestcontrol "${1}"
 	log "Installing 7z"
 	guest_control_exec "${1}" "cmd.exe" /c \
 		"echo start /wait msiexec /i C:\webpagetest\7z.msi /quiet /q INSTALLDIR=C:\7zip >c:\\webpagetest\\wpt.bat"
@@ -605,7 +605,7 @@ fi
 		"echo start c:\webpagetest\startup.bat >>c:\\webpagetest\\wpt.bat"
 	guest_control_exec "${1}" "cmd.exe" /c \
 		"echo start /wait schtasks /create /tn wptdriver /tr c:\webpagetest\agent\wptdriver.exe /sc onlogon  >>c:\\webpagetest\\wpt.bat"
-
+	wait_for_shutdown "${1}"
 
 }
 
