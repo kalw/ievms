@@ -538,7 +538,7 @@ fi
                 guest_control_exec "${1}" "cmd.exe" /c \
                         "echo start /wait  c:\\webpagetest\\mindinst.exe c:\\webpagetest\\agent\\dummynet\\netipfw.inf -i -s >>c:\\webpagetest\\wpt.bat"
                 guest_control_exec "${1}" "cmd.exe" /c \
-                        "echo shutdown.exe /s /f /t 0 >>C:\\webpagetest\\wpt.bat"
+                        "echo shutdown.exe /r /f /t 0 >>C:\\webpagetest\\wpt.bat"
                 guest_control_exec "${1}" "cmd.exe" /c \
                         "copy c:\\webpagetest\\wpt.bat C:\Users\\${guest_user}\\ievms.bat"
                 guest_control_exec "${1}" "schtasks.exe" /run /tn ievms
