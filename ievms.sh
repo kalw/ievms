@@ -7,6 +7,10 @@ set -o nounset
 set -o errtrace
 set -x
 # ## Gobal Variables
+WPT_SERVER_LOCATION = ${WPT_SERVER_LOCATION:-""}
+WPT_VERSION = ${WPT_VERSION:-""}
+WPT_MD5 = ${WPT_MD5:-""}
+WPT_SERVER_URL = ${WPT_SERVER_URL:-""}
 
 # The ievms version.
 ievms_version="0.3.1"
